@@ -32,13 +32,29 @@ To execute the script, follow these steps:
 Open a terminal in your development environment.
 
 Run the following command:
-``` python3 test.py -b [book_name] -a [alert_threshold] ```
-- [book_name]: The name of the order book you want to monitor, default is "btc_mxn" (BTC_MXN).
-- [alert_threshold]: The bid-ask spread threshold for generating alerts, default is 1.0%. You can set any other custom value.
 
- Example:
+```
+cd Challenge_1
+python3 save_books.py --bookname btc_mxn --alertspread 0.5 --datadir ./data
+```
 
-```python test.py -b btc_mxn -a 0.5```
+To get help with the arguments:
+
+```
+python3 save_books.py --help
+  usage: save_books.py [-h] [-b BOOKNAME] [-a ALERTSPREAD] [-d DATADIR]
+
+  Arguments for the process.
+
+  optional arguments:
+    -h, --help            show this help message and exit
+    -b BOOKNAME, --bookname BOOKNAME
+                          The book name of the orders to checks. example 'btc_mxn'.
+    -a ALERTSPREAD, --alertspread ALERTSPREAD
+                          The percentage of bid-ask spread to alert. example 1.0 for 1 percent
+    -d DATADIR, --datadir DATADIR
+                          full path for the data directory.
+```
 
 ## Justification of Partition Structure
 The chosen partition structure for storing data is based on the need to organize records by date and time. This facilitates easy retrieval and analysis of historical data. The structure is as follows:
@@ -100,7 +116,7 @@ To run the ETL script and generate the output tables, follow these steps:
 2. Run the simple ETL script:
 
    ```bash
-   python simple_etl.py
+   python3 simple_etl.py
    ```
 
 The script will extract, transform, and load the data into CSV files. 
