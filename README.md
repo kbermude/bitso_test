@@ -1,15 +1,30 @@
 # Bitso Test
-This test for Data Engineer position consist in two challenges.
-The first one: Bitso Order Book Monitoring Script designed to enable the "Markets" team to monitor the bid-ask spread in the MXN_BTC and USD_MXN order books provided by the Bitso API. Additionally, it generates alerts when the spread exceeds certain predefined thresholds, such as 1.0%, 0.5%, 0.1%, or any other custom value. Below is the detailed documentation of the script.
+This is the test for Data Engineer position, which consists in two challenges describe below.
 
-## Usage of the Script
+# Challenge 1
+
+Bitso Order Book Monitoring Script designed to enable the "Markets" team to monitor the bid-ask spread in the BTC_MXN and USD_MXN order books provided by the Bitso API. Additionally, it generates alerts when the spread exceeds certain predefined thresholds, such as 1.0%, 0.5%, 0.1%, or any other custom value. Below is the detailed documentation of the script.
+
 ## Requirements
-Before running the script, make sure you have the following Python libraries installed:
+Before running the script, make sure you have the following requriments:
 
-- requests: For making HTTP requests to the Bitso API.
-- pandas: For data manipulation and formatting.
-- asyncio: For enabling asynchronous programming.
-- argparse: For paring arguments
+- Python
+  - requests: For making HTTP requests to the Bitso API.
+  - pandas: For data manipulation and formatting.
+- Bitso API
+  - Testing account: you need create an account in bitso
+  - Funds: as developer you can contact directly to the team for this step
+  - Credentials: api key and api secret
+
+## Main Functionality
+The script performs the following actions:
+- Makes requests to the Bitso API to fetch real-time data from an order book (BTC_MXN or USD_MXN).
+- Calculates the bid-ask spread using the formula: (best_ask - best_bid) * 100 / best_ask.
+- Generates alerts if the spread exceeds the specified threshold.
+- Stores the records in CSV files every second and acumulate information for 10 minutes (600 records), in a directory structure simulating partitions in S3 by date and time.
+  
+## Alerts
+When the spread exceeds the specified threshold, an alert will be generated in the console. Alerts indicate that the spread is greater than the set threshold. The alerts by consolo can be change by any other type of alert.
 
 ## Running the Script
 To execute the script, follow these steps:
@@ -18,29 +33,23 @@ Open a terminal in your development environment.
 
 Run the following command:
 ``` python3 test.py -b [book_name] -a [alert_threshold] ```
-- [book_name]: The name of the order book you want to monitor, default is "btc_mxn" (MXN_BTC).
+- [book_name]: The name of the order book you want to monitor, default is "btc_mxn" (BTC_MXN).
 - [alert_threshold]: The bid-ask spread threshold for generating alerts, default is 1.0%. You can set any other custom value.
-Example:
+
+ Example:
+
 ```python test.py -b btc_mxn -a 0.5```
 
-## Main Functionality
-The script performs the following actions:
-- Makes requests to the Bitso API to fetch real-time data from an order book (MXN_BTC or USD_MXN).
-- Calculates the bid-ask spread using the formula: (best_ask - best_bid) * 100 / best_ask.
-- Generates alerts if the spread exceeds the specified threshold.
-
-Stores the records in CSV files every 10 minutes, in a directory structure simulating partitions in S3 by date and time.
-## Alerts
-When the spread exceeds the specified threshold, an alert will be generated in the console. Alerts indicate that the spread is greater than the set threshold.
 ## Justification of Partition Structure
 The chosen partition structure for storing data is based on the need to organize records by date and time. This facilitates easy retrieval and analysis of historical data. The structure is as follows:
 - 📁 ./data/
   - 📁 [book_name]/
     - 📁 [date]/
-      - 📁 [time]/
-      - 📄 data.csv
+      - 📁 [fixed_time]/
+        - 📄 data.csv
     
-Each CSV file contains records for a 10-minute period and is located in a directory corresponding to its date and time. This allows for easy retrieval and analysis of specific historical data.
+Fixed time refers to the modify time for every 10 minutos. Example: 17:00, 17:10, 17:20 ...
+Each data.csv file contains records for a 10-minute period and is located in a directory corresponding to its date and fixed time.
 
 # Challenge 2
 
@@ -51,7 +60,7 @@ This folder contains the Python ETL (Extract, Transform, Load) script to address
 The data modeling technique employed for this challenge is a traditional relational database model. This choice was made because it provides a structured and normalized way to organize data, making it suitable for complex analytical queries. The tables are designed to support the following use cases efficiently:
 
 - Tracking user activity
-- Identifying users' deposit behavior
+- Identifying user's deposit behavior
 - Analyzing login events
 - Summarizing currency-related data
 
@@ -65,7 +74,7 @@ The ERD illustrates the relationships between the primary entities: `Users`, `Tr
 
 ## Python ETL Script
 
-The ETL script is provided in the `simple_etl.py` file with the use of Airflow. It performs the following steps:
+The ETL script is provided in the `simple_etl.py` file. It performs the following steps:
 
 1. Extraction: Reads data from the CSV files.
 2. Transformation: Applies data transformations as required by the use cases.
